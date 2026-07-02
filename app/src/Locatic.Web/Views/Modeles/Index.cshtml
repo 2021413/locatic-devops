@@ -1,0 +1,36 @@
+@model IReadOnlyList<Modele>
+@{
+    ViewData["Title"] = "Modèles";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Modèles</h1>
+    <a class="btn btn-primary" asp-action="Create">+ Ajouter un modèle</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Aucun modèle enregistré.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Modèle</th>
+                    <th>Marque</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var modele in Model)
+                {
+                    <tr>
+                        <td>@modele.Nom</td>
+                        <td>@modele.Marque?.Nom</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,30 @@
+# Build output
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+artifacts/
+
+# .NET / Rider / VS
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+project.lock.json
+*.lock.json
+
+# SQLite database (recréée au démarrage via migrations + seed)
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+
+# NuGet
+*.nupkg
+.nuget/

@@ -1,0 +1,52 @@
+@model IReadOnlyList<Marque>
+@{
+    ViewData["Title"] = "Marques";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Marques &amp; modèles</h1>
+    <div>
+        <a class="btn btn-outline-primary" asp-controller="Modeles" asp-action="Create">+ Modèle</a>
+        <a class="btn btn-primary" asp-action="Create">+ Marque</a>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Aucune marque enregistrée.</div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var marque in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title d-flex justify-content-between">
+                            <span>@marque.Nom</span>
+                            <span class="badge bg-secondary align-self-start">@marque.Modeles.Count modèle(s)</span>
+                        </h5>
+                        @if (!string.IsNullOrWhiteSpace(marque.PaysOrigine))
+                        {
+                            <h6 class="card-subtitle mb-2 text-muted">@marque.PaysOrigine</h6>
+                        }
+                        @if (marque.Modeles.Any())
+                        {
+                            <ul class="list-unstyled mb-0 mt-2">
+                                @foreach (var modele in marque.Modeles.OrderBy(m => m.Nom))
+                                {
+                                    <li>• @modele.Nom</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <p class="text-muted mb-0"><em>Aucun modèle</em></p>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

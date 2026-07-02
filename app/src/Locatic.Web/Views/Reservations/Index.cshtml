@@ -1,0 +1,62 @@
+@model IReadOnlyList<Reservation>
+@{
+    ViewData["Title"] = "Réservations";
+    var aujourdhui = DateOnly.FromDateTime(DateTime.Today);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Réservations</h1>
+    <a class="btn btn-primary" asp-action="Create">+ Nouvelle réservation</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Aucune réservation enregistrée.</div>
+}
+else
+{
+    <div class="card shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Client</th>
+                    <th>Voiture</th>
+                    <th>Du</th>
+                    <th>Au</th>
+                    <th class="text-end">Jours</th>
+                    <th class="text-end">Montant</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in Model)
+                {
+                    var enCours = r.DateDebut <= aujourdhui && aujourdhui < r.DateFin;
+                    var aVenir = r.DateDebut > aujourdhui;
+                    <tr>
+                        <td>@r.Client?.NomComplet</td>
+                        <td>@r.Voiture?.Modele?.Marque?.Nom @r.Voiture?.Modele?.Nom <span class="text-muted">(@r.Voiture?.Immatriculation)</span></td>
+                        <td>@r.DateDebut.ToString("dd/MM/yyyy")</td>
+                        <td>@r.DateFin.ToString("dd/MM/yyyy")</td>
+                        <td class="text-end">@r.NombreJours</td>
+                        <td class="text-end">@r.Montant.ToString("0.00") €</td>
+                        <td>
+                            @if (enCours)
+                            {
+                                <span class="badge bg-success">En cours</span>
+                            }
+                            else if (aVenir)
+                            {
+                                <span class="badge bg-info text-dark">À venir</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Terminée</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

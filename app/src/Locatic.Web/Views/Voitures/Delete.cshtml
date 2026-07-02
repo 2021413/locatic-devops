@@ -1,0 +1,29 @@
+@model Voiture
+@{
+    ViewData["Title"] = "Supprimer la voiture";
+}
+
+<h1 class="h3 mb-4 text-danger">Supprimer la voiture</h1>
+
+<div class="alert alert-warning">Êtes-vous sûr de vouloir supprimer cette voiture ? Cette action est irréversible.</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Immatriculation</dt>
+            <dd class="col-sm-9"><code>@Model.Immatriculation</code></dd>
+
+            <dt class="col-sm-3">Marque / Modèle</dt>
+            <dd class="col-sm-9">@Model.Modele?.Marque?.Nom @Model.Modele?.Nom</dd>
+
+            <dt class="col-sm-3">Tarif journalier</dt>
+            <dd class="col-sm-9">@Model.TarifJournalier.ToString("0.00") €</dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
+            <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+        </form>
+        <a class="btn btn-link" asp-action="Index">Annuler</a>
+    </div>
+</div>

@@ -1,0 +1,52 @@
+@model ReservationFormViewModel
+@{
+    ViewData["Title"] = "Nouvelle réservation";
+}
+
+<h1 class="h3 mb-4">Nouvelle réservation</h1>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="ClientId" class="form-label"></label>
+                    <select asp-for="ClientId" asp-items="Model.ClientsDisponibles" class="form-select">
+                        <option value="">— Choisir un client —</option>
+                    </select>
+                    <span asp-validation-for="ClientId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="VoitureId" class="form-label"></label>
+                    <select asp-for="VoitureId" asp-items="Model.VoituresDisponibles" class="form-select">
+                        <option value="">— Choisir une voiture —</option>
+                    </select>
+                    <span asp-validation-for="VoitureId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DateDebut" class="form-label"></label>
+                    <input asp-for="DateDebut" type="date" class="form-control" />
+                    <span asp-validation-for="DateDebut" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DateFin" class="form-label"></label>
+                    <input asp-for="DateFin" type="date" class="form-control" />
+                    <span asp-validation-for="DateFin" class="text-danger"></span>
+                </div>
+            </div>
+
+            <p class="text-muted small mt-3 mb-0">Le montant est calculé automatiquement (tarif journalier × nombre de jours).</p>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Enregistrer la réservation</button>
+                <a class="btn btn-link" asp-action="Index">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

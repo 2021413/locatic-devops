@@ -1,0 +1,44 @@
+@model VoitureFormViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+<input type="hidden" asp-for="Id" />
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="Immatriculation" class="form-label"></label>
+        <input asp-for="Immatriculation" class="form-control" placeholder="AA-123-BB" />
+        <span asp-validation-for="Immatriculation" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="ModeleId" class="form-label"></label>
+        <select asp-for="ModeleId" asp-items="Model.ModelesDisponibles" class="form-select">
+            <option value="">— Choisir un modèle —</option>
+        </select>
+        <span asp-validation-for="ModeleId" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Annee" class="form-label"></label>
+        <input asp-for="Annee" class="form-control" />
+        <span asp-validation-for="Annee" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="TarifJournalier" class="form-label"></label>
+        <input asp-for="TarifJournalier" class="form-control" />
+        <span asp-validation-for="TarifJournalier" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="NombrePlaces" class="form-label"></label>
+        <input asp-for="NombrePlaces" class="form-control" />
+        <span asp-validation-for="NombrePlaces" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-3">
+        <label asp-for="Carburant" class="form-label"></label>
+        <select asp-for="Carburant" asp-items="Html.GetEnumSelectList<TypeCarburant>()" class="form-select"></select>
+        <span asp-validation-for="Carburant" class="text-danger"></span>
+    </div>
+</div>

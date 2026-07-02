@@ -1,0 +1,81 @@
+@model TableauDeBordStats
+@{
+    ViewData["Title"] = "Tableau de bord";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Tableau de bord</h1>
+    <a class="btn btn-primary" asp-controller="Reservations" asp-action="Create">+ Nouvelle réservation</a>
+</div>
+
+<div class="row g-3">
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <div class="display-6 fw-bold text-primary">@Model.NombreVoitures</div>
+                <div class="text-muted small">Voitures</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <div class="display-6 fw-bold text-success">@Model.ReservationsEnCours</div>
+                <div class="text-muted small">Réservations en cours</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <div class="display-6 fw-bold">@Model.NombreReservations</div>
+                <div class="text-muted small">Réservations (total)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <div class="display-6 fw-bold">@Model.NombreClients</div>
+                <div class="text-muted small">Clients</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <div class="display-6 fw-bold">@Model.NombreMarques</div>
+                <div class="text-muted small">Marques</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card text-center shadow-sm h-100">
+            <div class="card-body">
+                <div class="display-6 fw-bold">@Model.NombreModeles</div>
+                <div class="text-muted small">Modèles</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 g-3">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Gérer le parc</div>
+            <div class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action" asp-controller="Voitures" asp-action="Index">Voir et gérer les voitures</a>
+                <a class="list-group-item list-group-item-action" asp-controller="Voitures" asp-action="Create">Ajouter une voiture</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Locations</div>
+            <div class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action" asp-controller="Reservations" asp-action="Index">Voir les réservations</a>
+                <a class="list-group-item list-group-item-action" asp-controller="Clients" asp-action="Create">Ajouter un client</a>
+            </div>
+        </div>
+    </div>
+</div>

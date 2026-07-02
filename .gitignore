@@ -1,0 +1,73 @@
+# ---------- .NET ----------
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+artifacts/
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+project.lock.json
+*.lock.json
+
+# ---------- SQLite (recréée au démarrage via migrations) ----------
+*.db
+*.db-shm
+*.db-wal
+
+# ---------- Logs ----------
+*.log
+
+# ---------- NuGet ----------
+*.nupkg
+.nuget/
+
+# ============================================================
+#  DEVOPS — NE JAMAIS COMMITER (erreurs éliminatoires)
+# ============================================================
+
+# Terraform : état, plans, variables locales
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+!example.tfvars
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Secrets, tokens, clés
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*_rsa
+*_rsa.pub
+kubeconfig
+*.kubeconfig
+secrets.yaml
+secret.yaml
+!*secret*.example.yaml
+!*secret*.template.yaml
+
+# Ansible
+*.retry
+ansible/vault_pass*
+ansible/*.vault
+
+# Helm
+helm/**/charts/
+*.tgz
