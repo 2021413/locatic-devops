@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{948CE47B-FCB5-4490-BD4E-CC173E88B549}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7C3A1E5D-9B2F-4A8C-8D1E-6F0A2B4C8E9D}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Locatic.Domain", "src\Locatic.Domain\Locatic.Domain.csproj", "{B63AB198-6BFC-4E73-B337-CD70C9C20D3A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Locatic.Application", "src\Locatic.Application\Locatic.Application.csproj", "{BD19B54E-982A-49C0-B2D7-5784804AF3BC}"
@@ -12,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Locatic.Infrastructure", "src\Locatic.Infrastructure\Locatic.Infrastructure.csproj", "{E77911BE-5FCE-4901-A6DC-D747C0A9D8BD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Locatic.Web", "src\Locatic.Web\Locatic.Web.csproj", "{0CB204AA-3C90-4FEA-868F-5A6749592AC3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Locatic.Tests", "tests\Locatic.Tests\Locatic.Tests.csproj", "{3F8E2A1B-6C4D-4E9F-A2B1-0D5C7E8F9A0B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,11 +42,16 @@ Global
 		{0CB204AA-3C90-4FEA-868F-5A6749592AC3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CB204AA-3C90-4FEA-868F-5A6749592AC3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CB204AA-3C90-4FEA-868F-5A6749592AC3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F8E2A1B-6C4D-4E9F-A2B1-0D5C7E8F9A0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F8E2A1B-6C4D-4E9F-A2B1-0D5C7E8F9A0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F8E2A1B-6C4D-4E9F-A2B1-0D5C7E8F9A0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F8E2A1B-6C4D-4E9F-A2B1-0D5C7E8F9A0B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
+	GlobalSection(NestedProjects) = postSolution
 		{B63AB198-6BFC-4E73-B337-CD70C9C20D3A} = {948CE47B-FCB5-4490-BD4E-CC173E88B549}
 		{BD19B54E-982A-49C0-B2D7-5784804AF3BC} = {948CE47B-FCB5-4490-BD4E-CC173E88B549}
 		{E77911BE-5FCE-4901-A6DC-D747C0A9D8BD} = {948CE47B-FCB5-4490-BD4E-CC173E88B549}
 		{0CB204AA-3C90-4FEA-868F-5A6749592AC3} = {948CE47B-FCB5-4490-BD4E-CC173E88B549}
+		{3F8E2A1B-6C4D-4E9F-A2B1-0D5C7E8F9A0B} = {7C3A1E5D-9B2F-4A8C-8D1E-6F0A2B4C8E9D}
 	EndGlobalSection
 EndGlobal
