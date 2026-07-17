@@ -1,0 +1,25 @@
+---
+# Variables par défaut des playbooks Locatic.
+# Toutes sont surchargeables à l'exécution : ansible-playbook deploy.yml -e image_tag=sha-abc1234
+
+# Dossier Terraform dont on consomme les outputs (namespace, PVC).
+terraform_dir: "{{ playbook_dir }}/../infra/terraform"
+
+# Chart Helm du lot C (déploiement App + Nginx + PVC monté).
+chart_path: "{{ playbook_dir }}/../helm/locatic"
+
+# Nom de la release Helm (contrat d'équipe, voir PLAN-EQUIPE.md §2).
+helm_release: locatic
+
+# Tag de l'image ghcr.io/2021413/locatic à déployer.
+# `latest` par défaut ; utiliser un tag immuable en démo : -e image_tag=sha-xxxxxxx
+image_tag: latest
+
+# Délai maximal accordé à `helm upgrade/rollback --wait`.
+helm_timeout: 5m
+
+# Délai maximal accordé aux `kubectl rollout status`.
+rollout_timeout: 120s
+
+# NodePort du service Nginx (seul point d'entrée, défini dans helm/locatic/values.yaml).
+nginx_node_port: 30080
