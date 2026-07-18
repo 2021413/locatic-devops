@@ -10,7 +10,7 @@ metadata:
   name: locatic-prometheus
 rules:
   - apiGroups: [""]
-    resources: ["nodes", "services", "endpoints", "pods"]
+    resources: ["nodes", "nodes/metrics", "services", "endpoints", "pods"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["extensions", "networking.k8s.io"]
     resources: ["ingresses"]

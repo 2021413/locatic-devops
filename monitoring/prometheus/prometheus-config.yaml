@@ -8,6 +8,17 @@ data:
     global:
       scrape_interval: 15s
 
+    # Règles d'alerte montées depuis la ConfigMap prometheus-rules
+    # (voir prometheus-rules.yaml et prometheus-deployment.yaml).
+    rule_files:
+      - /etc/prometheus/rules/*.yml
+
+    # Les alertes qui passent en FIRING sont envoyées à Alertmanager.
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets: ["alertmanager.locatic.svc.cluster.local:9093"]
+
     scrape_configs:
       # App et Nginx : découverte automatique via les annotations prometheus.io/*
       # posées sur les pods (voir k8s/base et helm/locatic/templates).
@@ -38,3 +49,18 @@ data:
       - job_name: kube-state-metrics
         static_configs:
           - targets: ["kube-state-metrics.locatic.svc.cluster.local:8080"]
+
+      # Kubelet de chaque nœud : expose notamment kubelet_volume_stats_*
+      # (occupation réelle des PVC), utilisé par l'alerte LocaticPvcAlmostFull
+      # et le panel « Stockage » du dashboard Grafana.
+      - job_name: kubernetes-nodes
+        kubernetes_sd_configs:
+          - role: node
+        scheme: https
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        tls_config:
+          # Démo locale (minikube) : le certificat du kubelet est auto-signé.
+          insecure_skip_verify: true
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_node_name]
+            target_label: node

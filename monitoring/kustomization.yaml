@@ -6,9 +6,13 @@ namespace: locatic
 resources:
   - prometheus/prometheus-rbac.yaml
   - prometheus/prometheus-config.yaml
+  - prometheus/prometheus-rules.yaml
   - prometheus/prometheus-deployment.yaml
   - prometheus/prometheus-service.yaml
   - prometheus/kube-state-metrics.yaml
+  - alertmanager/alertmanager-config.yaml
+  - alertmanager/alertmanager-deployment.yaml
+  - alertmanager/alertmanager-service.yaml
   - grafana/grafana-datasource-configmap.yaml
   - grafana/grafana-dashboard-provider-configmap.yaml
   - grafana/grafana-deployment.yaml
