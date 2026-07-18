@@ -22,5 +22,18 @@ data:
           proxy_set_header X-Forwarded-Proto $scheme;
         }
       }
+
+      {{- if .Values.nginx.exporter.enabled }}
+      # Endpoint interne (loopback uniquement) scrappé par le sidecar nginx-prometheus-exporter.
+      server {
+        listen 127.0.0.1:8081;
+
+        location /stub_status {
+          stub_status;
+          allow 127.0.0.1;
+          deny all;
+        }
+      }
+      {{- end }}
     }
 {{- end }}

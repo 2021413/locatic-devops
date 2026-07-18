@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: locatic
+  labels:
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/part-of: locatic
+spec:
+  # NodePort pour un accès direct en démo locale (outil d'observabilité, pas l'app).
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: grafana
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+      nodePort: 30030

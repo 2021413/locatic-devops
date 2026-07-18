@@ -1,0 +1,59 @@
+{
+  "title": "Locatic — Overview",
+  "uid": "locatic-overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "App — up",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "up{pod=~\"locatic-app.*\"}",
+          "legendFormat": "app"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "App — requêtes HTTP (rate 5m)",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(http_requests_received_total{pod=~\"locatic-app.*\"}[5m]))",
+          "legendFormat": "req/s"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Nginx — up",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "expr": "nginx_up{pod=~\"locatic-nginx.*\"}",
+          "legendFormat": "nginx"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Pods — état (namespace locatic)",
+      "type": "table",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 6 },
+      "targets": [
+        {
+          "expr": "kube_pod_status_phase{namespace=\"locatic\"} == 1",
+          "legendFormat": "{{pod}} — {{phase}}"
+        }
+      ]
+    }
+  ]
+}

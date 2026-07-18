@@ -26,6 +26,21 @@ nginx:
     limits:
       cpu: 200m
       memory: 64Mi
+  # Sidecar nginx-prometheus-exporter : expose les métriques Nginx sur /metrics:9113
+  # à partir du endpoint interne stub_status (monitoring/, PR #9).
+  exporter:
+    enabled: true
+    image:
+      repository: nginx/nginx-prometheus-exporter
+      tag: "0.11.0"
+    port: 9113
+    resources:
+      requests:
+        cpu: 20m
+        memory: 16Mi
+      limits:
+        cpu: 100m
+        memory: 32Mi
 
 persistence:
   enabled: true
@@ -62,6 +77,6 @@ secret:
   data:
     EXAMPLE_KEY: "changeme"
 
-# Activé en PR #9 (stack monitoring) : bascule l'annotation prometheus.io/scrape.
+# Bascule l'annotation prometheus.io/scrape sur l'app (stack monitoring, PR #9).
 monitoring:
-  enabled: false
+  enabled: true
