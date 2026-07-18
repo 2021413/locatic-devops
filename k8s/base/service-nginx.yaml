@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: locatic-nginx
+  labels:
+    app.kubernetes.io/name: locatic-nginx
+    app.kubernetes.io/part-of: locatic
+spec:
+  # Seul point d'entrée du système : l'app n'est jamais exposée directement (ClusterIP only).
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: locatic-nginx
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      nodePort: 30080

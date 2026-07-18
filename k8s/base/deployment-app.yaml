@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: locatic-app
+  labels:
+    app.kubernetes.io/name: locatic-app
+    app.kubernetes.io/part-of: locatic
+spec:
+  # SQLite ne supporte pas les écritures concurrentes multi-pods sur le même fichier :
+  # on reste à 1 réplique tant que la persistance est un fichier SQLite sur PVC RWO.
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: locatic-app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: locatic-app
+        app.kubernetes.io/part-of: locatic
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: locatic-app
+          # TODO(#5): remplacer par le tag sha-xxxxxxx publié sur GHCR par la CI.
+          image: ghcr.io/2021413/locatic:latest
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://+:8080"
+            - name: ConnectionStrings__LocaticDb
+              value: "Data Source=/data/locatic.db"
+          envFrom:
+            - secretRef:
+                name: locatic-secrets
+                optional: true
+          volumeMounts:
+            - name: sqlite-data
+              mountPath: /data
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+      volumes:
+        - name: sqlite-data
+          # PVC provisionné par Terraform (lot B) — pas créé ici, seulement référencé.
+          persistentVolumeClaim:
+            claimName: locatic-sqlite-pvc

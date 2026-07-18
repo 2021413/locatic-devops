@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: locatic-app
+  labels:
+    app.kubernetes.io/name: locatic-app
+    app.kubernetes.io/part-of: locatic
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: locatic-app
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
