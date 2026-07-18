@@ -1,0 +1,67 @@
+image:
+  repository: ghcr.io/2021413/locatic
+  tag: latest
+  pullPolicy: IfNotPresent
+
+# SQLite ne supporte pas les écritures concurrentes multi-pods sur le même fichier.
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+
+nginx:
+  enabled: true
+  image:
+    repository: nginx
+    tag: 1.27-alpine
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 30080
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      cpu: 200m
+      memory: 64Mi
+
+persistence:
+  enabled: true
+  # PVC provisionné par Terraform (lot B) — le chart le référence, ne le crée pas.
+  existingClaim: locatic-sqlite-pvc
+  mountPath: /data
+
+env:
+  ASPNETCORE_URLS: "http://+:8080"
+  connectionString: "Data Source=/data/locatic.db"
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 10
+    periodSeconds: 10
+  readiness:
+    path: /health/ready
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+secret:
+  create: true
+  name: locatic-secrets
+  # Template uniquement : aucune valeur réelle par défaut.
+  data:
+    EXAMPLE_KEY: "changeme"
+
+# Activé en PR #9 (stack monitoring) : bascule l'annotation prometheus.io/scrape.
+monitoring:
+  enabled: false
