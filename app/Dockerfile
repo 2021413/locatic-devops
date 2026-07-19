@@ -22,13 +22,12 @@ RUN dotnet publish src/Locatic.Web/Locatic.Web.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
 
+# L'image aspnet:9.0 fournit déjà l'utilisateur non-root `app`.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system app \
-    && useradd --system --gid app --create-home app \
     && mkdir -p /data \
-    && chown -R app:app /data /app
+    && chown -R app:app /data
 
 ENV ASPNETCORE_URLS=http://+:8080 \
     ASPNETCORE_ENVIRONMENT=Production \
