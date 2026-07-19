@@ -6,7 +6,8 @@ Jobs :
 - `build-test` : restore, build, tests, `dotnet format`
 - `docker-build` : image Docker (sans push)
 - `scan` : Gitleaks (secrets) + Trivy (vulnérabilités HIGH/CRITICAL)
+- `publish` : push vers GHCR **uniquement sur `main`** (`ghcr.io/<owner>/locatic:sha-xxxxxxx` + `:latest`)
 
-La publication GHCR sur `main` arrive dans une PR dédiée (`feat/ci-publish-ghcr`).
+Le pipeline ne déploie pas sur minikube (Terraform / Ansible restent locaux).
 
 Voir aussi [`docs/ci-cd.md`](../docs/ci-cd.md).
