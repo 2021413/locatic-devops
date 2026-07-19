@@ -1,6 +1,30 @@
 # Infrastructure locale — Terraform
 
-Provisionne namespace + PVC SQLite sur minikube et expose des outputs pour Ansible (Lot B).
-Voir [../../docs/terraform.md](../../docs/terraform.md).
+Provisionne sur **minikube** :
+- le namespace `locatic`
+- le PVC `locatic-sqlite-pvc` (SQLite)
+- des **outputs** consommés ensuite par Ansible
 
-**Ne jamais commiter** `*.tfstate`, `*.tfvars`.
+## Prérequis
+
+- minikube démarré (`minikube start`)
+- `kubectl` configuré sur le cluster
+- Terraform >= 1.5
+
+## Usage
+
+```bash
+cd infra/terraform
+terraform init
+terraform fmt
+terraform validate
+terraform plan -var-file=example.tfvars
+terraform apply -var-file=example.tfvars
+terraform output -json
+```
+
+Outputs utiles pour Ansible : `namespace`, `pvc_name`, `ansible_vars`.
+
+**Ne jamais commiter** `*.tfstate`, `terraform.tfvars`.
+
+Détails : [docs/terraform.md](../../docs/terraform.md).
