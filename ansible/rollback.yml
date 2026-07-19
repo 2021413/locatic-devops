@@ -1,0 +1,121 @@
+---
+# Rollback de la release Helm `locatic` vers une révision antérieure.
+#
+# La révision cible est OBLIGATOIRE et se passe en ligne de commande :
+#
+#   ansible-playbook rollback.yml -e revision=2
+#
+# Consulter les révisions disponibles : `helm history locatic -n locatic`
+# (le playbook les affiche aussi avant d'agir).
+
+- name: Revenir à une révision antérieure de la release Locatic
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    # ------------------------------------------------------------------
+    # 1. Garde-fous : variable `revision` fournie et outils disponibles
+    # ------------------------------------------------------------------
+    - name: Prérequis | Vérifier que la révision cible est fournie
+      ansible.builtin.assert:
+        that:
+          - revision is defined
+          - revision | string | trim | length > 0
+        fail_msg: >-
+          Variable `revision` obligatoire.
+          Usage : ansible-playbook rollback.yml -e revision=N
+          (listez les révisions avec `helm history {{ helm_release }} -n <namespace>`).
+
+    - name: Prérequis | Chercher les binaires requis
+      ansible.builtin.shell: "command -v {{ item }}"
+      loop:
+        - terraform
+        - kubectl
+        - helm
+      register: required_bins
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Prérequis | Vérifier que tous les binaires sont installés
+      ansible.builtin.assert:
+        that:
+          - required_bins.results | selectattr('rc', 'ne', 0) | list | length == 0
+        fail_msg: >-
+          Binaire(s) introuvable(s) dans le PATH :
+          {{ required_bins.results | selectattr('rc', 'ne', 0) | map(attribute='item') | join(', ') }}.
+
+    # ------------------------------------------------------------------
+    # 2. Namespace : même source de vérité que deploy.yml (outputs Terraform)
+    # ------------------------------------------------------------------
+    - name: Terraform | Lire les outputs (terraform output -json)
+      ansible.builtin.command: terraform output -json
+      args:
+        chdir: "{{ terraform_dir }}"
+      register: tf_output_raw
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Terraform | Vérifier que l'infra a bien été appliquée
+      ansible.builtin.fail:
+        msg: >-
+          Impossible de lire les outputs Terraform dans {{ terraform_dir }}.
+          Appliquez d'abord l'infra (`terraform apply`) : sans namespace, rien à restaurer.
+      when: tf_output_raw.rc != 0 or (tf_output_raw.stdout | from_json | length) == 0
+
+    - name: Terraform | Extraire le namespace des outputs
+      ansible.builtin.set_fact:
+        tf_vars: "{{ (tf_output_raw.stdout | from_json).ansible_vars.value }}"
+
+    # ------------------------------------------------------------------
+    # 3. État courant : historique des révisions avant intervention
+    # ------------------------------------------------------------------
+    - name: Helm | Lire l'historique de la release {{ helm_release }}
+      ansible.builtin.command: >-
+        helm history {{ helm_release }} --namespace {{ tf_vars.namespace }}
+      register: helm_history
+      changed_when: false
+      check_mode: false
+
+    - name: Helm | Afficher l'historique avant rollback
+      ansible.builtin.debug:
+        msg: "{{ helm_history.stdout_lines }}"
+
+    # ------------------------------------------------------------------
+    # 4. Rollback vers la révision demandée
+    # ------------------------------------------------------------------
+    - name: Helm | Revenir à la révision {{ revision | default('?') }}
+      ansible.builtin.command:
+        argv:
+          - helm
+          - rollback
+          - "{{ helm_release }}"
+          - "{{ revision }}"
+          - --namespace
+          - "{{ tf_vars.namespace }}"
+          - --wait
+          - --timeout
+          - "{{ helm_timeout }}"
+      register: helm_rollback
+      changed_when: helm_rollback.rc == 0
+
+    # ------------------------------------------------------------------
+    # 5. Vérification : les deployments repartent sains
+    # ------------------------------------------------------------------
+    - name: Vérification | Attendre le rollout des deployments
+      ansible.builtin.command: >-
+        kubectl rollout status deployment/{{ item }}
+        --namespace {{ tf_vars.namespace }}
+        --timeout={{ rollout_timeout }}
+      loop:
+        - locatic-app
+        - locatic-nginx
+      register: rollout_status
+      changed_when: false
+
+    - name: Vérification | Confirmer le rollback
+      ansible.builtin.debug:
+        msg: >-
+          Rollback vers la révision {{ revision }} terminé.
+          Contrôlez avec : helm history {{ helm_release }} -n {{ tf_vars.namespace }}

@@ -1,0 +1,138 @@
+---
+# Déploiement de Locatic sur minikube via Helm.
+#
+# Chaîne : Terraform (namespace + PVC) -> ce playbook -> release Helm `locatic`.
+# Idempotent : relançable à volonté, `helm upgrade --install` converge vers l'état voulu.
+#
+#   ansible-playbook deploy.yml
+#   ansible-playbook deploy.yml -e image_tag=sha-abc1234
+
+- name: Déployer Locatic (release Helm) à partir des outputs Terraform
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    # ------------------------------------------------------------------
+    # 1. Prérequis : outils CLI présents et cluster minikube démarré
+    # ------------------------------------------------------------------
+    - name: Prérequis | Chercher les binaires requis
+      ansible.builtin.shell: "command -v {{ item }}"
+      loop:
+        - terraform
+        - kubectl
+        - helm
+        - minikube
+      register: required_bins
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Prérequis | Vérifier que tous les binaires sont installés
+      ansible.builtin.assert:
+        that:
+          - required_bins.results | selectattr('rc', 'ne', 0) | list | length == 0
+        fail_msg: >-
+          Binaire(s) introuvable(s) dans le PATH :
+          {{ required_bins.results | selectattr('rc', 'ne', 0) | map(attribute='item') | join(', ') }}.
+          Installez-les avant de relancer le playbook (voir ansible/README.md).
+        success_msg: "terraform, kubectl, helm et minikube sont disponibles."
+
+    - name: Prérequis | Interroger l'état de minikube
+      ansible.builtin.command: minikube status
+      register: minikube_status
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Prérequis | Vérifier que minikube est démarré
+      ansible.builtin.assert:
+        that:
+          - minikube_status.rc == 0
+        fail_msg: >-
+          minikube ne répond pas (rc={{ minikube_status.rc }}).
+          Démarrez le cluster avec `minikube start` puis relancez le playbook.
+        success_msg: "minikube est démarré et joignable."
+
+    # ------------------------------------------------------------------
+    # 2. Outputs Terraform : namespace et PVC provisionnés par le lot B.2
+    # ------------------------------------------------------------------
+    - name: Terraform | Lire les outputs (terraform output -json)
+      ansible.builtin.command: terraform output -json
+      args:
+        chdir: "{{ terraform_dir }}"
+      register: tf_output_raw
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
+    - name: Terraform | Vérifier que l'infra a bien été appliquée
+      ansible.builtin.fail:
+        msg: >-
+          Impossible de lire les outputs Terraform dans {{ terraform_dir }}
+          (sortie vide ou commande en échec). Appliquez d'abord l'infra :
+          `cd {{ terraform_dir }} && terraform init && terraform apply -var-file=example.tfvars`.
+      when: tf_output_raw.rc != 0 or (tf_output_raw.stdout | from_json | length) == 0
+
+    - name: Terraform | Extraire namespace et PVC des outputs
+      ansible.builtin.set_fact:
+        tf_vars: "{{ (tf_output_raw.stdout | from_json).ansible_vars.value }}"
+
+    - name: Terraform | Récapitulatif des valeurs consommées
+      ansible.builtin.debug:
+        msg: >-
+          Namespace={{ tf_vars.namespace }} |
+          PVC={{ tf_vars.pvc_name }} ({{ tf_vars.pvc_storage }}) |
+          Release={{ helm_release }} | Image tag={{ image_tag }}
+
+    # ------------------------------------------------------------------
+    # 3. Déploiement : helm upgrade --install (chemin nominal, bonus Helm)
+    # ------------------------------------------------------------------
+    - name: Helm | Déployer ou mettre à jour la release {{ helm_release }}
+      ansible.builtin.command:
+        argv:
+          - helm
+          - upgrade
+          - --install
+          - "{{ helm_release }}"
+          - "{{ chart_path }}"
+          - --namespace
+          - "{{ tf_vars.namespace }}"
+          - --set
+          - "image.tag={{ image_tag }}"
+          - --set
+          - "persistence.existingClaim={{ tf_vars.pvc_name }}"
+          - --wait
+          - --timeout
+          - "{{ helm_timeout }}"
+      register: helm_deploy
+      changed_when: "'STATUS: deployed' in helm_deploy.stdout"
+
+    # ------------------------------------------------------------------
+    # 4. Vérification : rollout des deployments App et Nginx
+    # ------------------------------------------------------------------
+    - name: Vérification | Attendre le rollout des deployments
+      ansible.builtin.command: >-
+        kubectl rollout status deployment/{{ item }}
+        --namespace {{ tf_vars.namespace }}
+        --timeout={{ rollout_timeout }}
+      loop:
+        - locatic-app
+        - locatic-nginx
+      register: rollout_status
+      changed_when: false
+
+    # ------------------------------------------------------------------
+    # 5. URL d'accès : Nginx est le seul point d'entrée (NodePort 30080)
+    # ------------------------------------------------------------------
+    - name: Accès | Récupérer l'IP du cluster minikube
+      ansible.builtin.command: minikube ip
+      register: minikube_ip
+      changed_when: false
+      check_mode: false
+
+    - name: Accès | Afficher l'URL de l'application
+      ansible.builtin.debug:
+        msg:
+          - "Déploiement terminé — révision Helm : {{ helm_deploy.stdout | default('') | regex_search('REVISION: [0-9]+') | default('n/a', true) }}"
+          - "Locatic est accessible via Nginx : http://{{ minikube_ip.stdout }}:{{ nginx_node_port }}"
+          - "Alternative : minikube service {{ helm_release }}-nginx -n {{ tf_vars.namespace }} --url"
