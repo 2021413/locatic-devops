@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: locatic
+  labels:
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: locatic
+spec:
+  # NodePort pour un accès direct en démo locale (outil d'observabilité, pas l'app :
+  # ne contrevient pas à la règle "app exposée uniquement via Nginx").
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: prometheus
+  ports:
+    - name: http
+      port: 9090
+      targetPort: http
+      nodePort: 30090

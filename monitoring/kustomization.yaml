@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: locatic
+
+resources:
+  - prometheus/prometheus-rbac.yaml
+  - prometheus/prometheus-config.yaml
+  - prometheus/prometheus-deployment.yaml
+  - prometheus/prometheus-service.yaml
+  - prometheus/kube-state-metrics.yaml
+  - grafana/grafana-datasource-configmap.yaml
+  - grafana/grafana-dashboard-provider-configmap.yaml
+  - grafana/grafana-deployment.yaml
+  - grafana/grafana-service.yaml
+
+# Génère la ConfigMap grafana-dashboard-locatic directement depuis le JSON source,
+# pour éviter de dupliquer le dashboard entre le fichier et un manifeste ConfigMap.
+configMapGenerator:
+  - name: grafana-dashboard-locatic
+    files:
+      - locatic-overview.json=grafana/dashboards/locatic-overview.json
+
+generatorOptions:
+  disableNameSuffixHash: true

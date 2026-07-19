@@ -16,6 +16,12 @@ spec:
       labels:
         app.kubernetes.io/name: locatic-nginx
         app.kubernetes.io/part-of: locatic
+      annotations:
+        {{- if .Values.nginx.exporter.enabled }}
+        prometheus.io/scrape: {{ .Values.monitoring.enabled | quote }}
+        prometheus.io/port: {{ .Values.nginx.exporter.port | quote }}
+        prometheus.io/path: "/metrics"
+        {{- end }}
     spec:
       containers:
         - name: nginx
@@ -29,6 +35,17 @@ spec:
               subPath: nginx.conf
           resources:
             {{- toYaml .Values.nginx.resources | nindent 12 }}
+        {{- if .Values.nginx.exporter.enabled }}
+        - name: nginx-exporter
+          image: "{{ .Values.nginx.exporter.image.repository }}:{{ .Values.nginx.exporter.image.tag }}"
+          args:
+            - --nginx.scrape-uri=http://127.0.0.1:8081/stub_status
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.nginx.exporter.port }}
+          resources:
+            {{- toYaml .Values.nginx.exporter.resources | nindent 12 }}
+        {{- end }}
       volumes:
         - name: nginx-conf
           configMap:
