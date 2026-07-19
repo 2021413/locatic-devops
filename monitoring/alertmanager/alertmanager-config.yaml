@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: locatic
+data:
+  alertmanager.yml: |
+    # Configuration minimale pour la démo locale : les alertes sont reçues,
+    # regroupées et visibles dans l'UI d'Alertmanager (port 9093), mais aucune
+    # notification externe n'est envoyée (receiver "default" vide).
+    route:
+      receiver: default
+      # Regroupe les alertes d'un même nom pour éviter le bruit.
+      group_by: ["alertname"]
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 4h
+
+    receivers:
+      - name: default
+        # Pour brancher un vrai canal de notification, ajouter ici une
+        # intégration, par exemple :
+        #
+        #   slack_configs:
+        #     - api_url: https://hooks.slack.com/services/XXX/YYY/ZZZ
+        #       channel: "#locatic-alertes"
+        #
+        # ou un e-mail :
+        #
+        #   email_configs:
+        #     - to: equipe@example.com
+        #       from: alertmanager@example.com
+        #       smarthost: smtp.example.com:587
+        #       auth_username: alertmanager@example.com
+        #       auth_password: "<mot de passe SMTP>"
+        #
+        # (secrets à sortir de la ConfigMap : utiliser un Secret Kubernetes).

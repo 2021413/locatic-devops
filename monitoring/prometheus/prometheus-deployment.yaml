@@ -24,12 +24,17 @@ spec:
           args:
             - --config.file=/etc/prometheus/prometheus.yml
             - --storage.tsdb.path=/prometheus
+            # Permet de recharger la config/les règles sans redémarrer le pod :
+            #   kubectl exec deploy/prometheus -n locatic -- wget -qO- --post-data='' http://localhost:9090/-/reload
+            - --web.enable-lifecycle
           ports:
             - name: http
               containerPort: 9090
           volumeMounts:
             - name: config
               mountPath: /etc/prometheus
+            - name: rules
+              mountPath: /etc/prometheus/rules
             - name: storage
               mountPath: /prometheus
           resources:
@@ -43,6 +48,9 @@ spec:
         - name: config
           configMap:
             name: prometheus-config
+        - name: rules
+          configMap:
+            name: prometheus-rules
         - name: storage
           # Stockage éphémère : suffisant pour la démo locale (pas de contrat de persistance
           # des métriques dans ce projet, contrairement à la base SQLite de l'app).

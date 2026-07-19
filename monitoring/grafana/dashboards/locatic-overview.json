@@ -54,6 +54,45 @@
           "legendFormat": "{{pod}} — {{phase}}"
         }
       ]
+    },
+    {
+      "id": 5,
+      "title": "Stockage — PVC SQLite (% utilisé)",
+      "type": "gauge",
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 14 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 85 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "100 * kubelet_volume_stats_used_bytes{namespace=\"locatic\", persistentvolumeclaim=\"locatic-sqlite-pvc\"} / kubelet_volume_stats_capacity_bytes{namespace=\"locatic\", persistentvolumeclaim=\"locatic-sqlite-pvc\"}",
+          "legendFormat": "locatic-sqlite-pvc"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Monitoring — cibles up",
+      "type": "table",
+      "gridPos": { "h": 6, "w": 16, "x": 8, "y": 14 },
+      "targets": [
+        {
+          "expr": "up",
+          "legendFormat": "{{job}} — {{pod}}"
+        }
+      ]
     }
   ]
 }
