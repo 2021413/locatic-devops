@@ -24,6 +24,7 @@ WORKDIR /app
 
 # L'image aspnet:9.0 fournit déjà l'utilisateur non-root `app`.
 RUN apt-get update \
+    && apt-get upgrade -y --no-install-recommends \
     && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /data \
